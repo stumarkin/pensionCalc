@@ -1,0 +1,17 @@
+body {
+  padding: 20px 0;
+}
+
+form .form-group label {
+  margin-top: 40px;
+}
+form .form-group label:first-child {
+  margin-top: 10px;
+}
+form .form-group label span {
+  font-weight: 600;
+}
+
+table.detailed_calc th, table.detailed_calc td {
+  text-align: right;
+}

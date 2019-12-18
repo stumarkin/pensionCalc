@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>PensionCalc</title>
+  <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.min.css'><link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<div id="app-4">
+  <div class="container">
+    <div cless="row">
+      <h3>Как позаботиться о себе самому и не оказаться нищим в будущем?</h3>
+    </div>
+    <div cless="row">
+      <hr>
+    </div>
+    <div class="row">
+      <div class="col-12 col-md-6">
+        <div class="alert alert-warning ">
+          <form>
+            <div class="form-group">
+              <label for="currentSalaryPercentage">Моя текущая зарплата (net) - <span>{{ currentSalary }} тыс. ₽</span></label>
+              <input type="range" class="form-control-range" id="currentSalaryPercentage" v-model="currentSalaryPercentage">
+
+              <label for="suspectedSalaryGrowthPercentage">Я предполагаю, что ежегодно она будет увеличиваться на  <span>{{ suspectedSalaryGrowth }}%</span></label>
+              <input type="range" class="form-control-range" id="suspectedSalaryGrowthPercentage" v-model="suspectedSalaryGrowthPercentage">
+
+              <label for="investValueFromSalaryPercentage">И ради большой цели я готов откладывать <span>{{ investValueFromSalaryPercentage }}%</span> от своей зарплаты</label>
+              <input type="range" class="form-control-range" id="suspectedSalaryGrowthPercentage" v-model="investValueFromSalaryPercentage">
+
+               <label for="suspectedInvestmentProfitPercentage">И инвестировать их под <span>{{ suspectedInvestmentProfit }}%</span> годовых &nbsp;&nbsp;<a href="#">Да как же?</a></label>
+              <input type="range" class="form-control-range" id="suspectedPensionNeedsPercentage" v-model="suspectedInvestmentProfitPercentage">
+              
+              <label for="currentAge">Мне сейчас <span>{{ currentAge }}</span> {{ getYearsStr(currentAge) }}</label>
+              <input type="range" class="form-control-range" id="currentAge" v-model="currentAge">
+
+              <label for="suspectedPensionAge">И я предполагаю  работать до <span>{{ suspectedPensionAge }} {{ getYearsStr(suspectedPensionAge) }}</span></label>
+              <input type="range" class="form-control-range" id="suspectedPensionAge" v-model="suspectedPensionAge">
+
+              <label for="suspectedPensionNeedsPercentage">Для комфортной жизни неработающего человека мне сейчас бы хватало <span>{{ suspectedPensionNeeds }} тыс. ₽</span></label>
+              <input type="range" class="form-control-range" id="suspectedPensionNeedsPercentage" v-model="suspectedPensionNeedsPercentage">
+            </div>
+            
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="iis" v-model="iis">
+                <label  class="form-check-label" for="iis">А начну я с открытия индивидуального инвестиционного счета (ИИС) <a href="#">Что это?</a></label>
+              </div>
+            
+          </form>
+        </div>
+      </div>
+      <div class="col-12 col-md-6">
+        <div class="alert alert-success" role="alert">
+          <p class="mb-0">Просто инвестируя {{ investValueFromSalaryPercentage }}% от своей зарплаты через&nbsp;{{ suspectedPensionAge-currentAge }}&nbsp;{{ getYearsStr(suspectedPensionAge-currentAge) }} ваш капитал составит целых</p>
+
+          <h4 class="alert-heading">{{ Math.round(suspectedInvestmentValuesSummary.capital/1000,5) }} миллионов ₽</h4>
+          <br>
+          <p class="mb-0">А ежемесячный пассивный доход ни много ни мало</p>
+          <h4 class="alert-heading">{{ Math.round(suspectedInvestmentValuesSummary.pension) }} тыс. ₽ в месяц</h4>
+          <hr>
+           <p class="mb-0">Неплохая прибавка к государственной пенсии, которой вообще-то, может и не быть, верно?!</p>
+          <small><a href="#">Что-то не верится. Как вы это посчитали?</a></small>
+        </div>
+
+   
+        <button type="button" class="btn btn-primary btn-lg btn-block">Я готов! С чего начинать?</button>
+<button type="button" class="btn btn-light btn-sm btn-block">Это все здорово, но у меня нет денег...</button>
+      </div>
+      
+    </div>
+
+    <table class="detailed_calc table table-hover table-sm">
+      <thead>
+        <th><br>&nbsp;</th>
+        <th>Возраст<br>&nbsp;</th>
+        <th>Годовая зп,<br>тыс. ₽</th>
+        <th>Инвестиции за год<br>тыс. ₽</th>
+        <th>Капитал<br>тыс. ₽</th>
+        <th>Доход с капитала<br>тыс. ₽</th>
+        <th>Пенсия<br>тыс. ₽</th>
+        <th>Эквивалент<br>{{ suspectedPensionNeeds }} тыс. ₽<br><small class="text-muted">с учетом инфляции 4%</small></th>
+      </thead>
+      <tr v-for="(suspectedInvestmentValue, index) in suspectedInvestmentValues">
+        <td>
+          {{ suspectedInvestmentValue.year }}
+        </td>
+        <td>
+          {{ suspectedInvestmentValue.age }}
+        </td>
+        <td>
+          {{ Math.round(suspectedInvestmentValue.salary).toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ') }}
+        </td>
+        <td>
+          {{ Math.round(suspectedInvestmentValue.invest).toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ') }}
+        </td>
+        <td v-bind:class="{ 'bg-success': suspectedInvestmentValue.highlight }">
+          {{ Math.round(suspectedInvestmentValue.capital).toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ') }}
+        </td>
+        <td>
+          <span class="badge badge-success" v-show="suspectedInvestmentValue.iisProfit" >+{{ Math.round(suspectedInvestmentValue.iisProfit) }} по ИИС</span>
+          {{ Math.round(suspectedInvestmentValue.profit).toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ') }}
+          
+        </td>
+        <td v-bind:class="{ 'bg-success': suspectedInvestmentValue.highlight }">
+          {{ Math.round(suspectedInvestmentValue.pension).toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ') }}
+        </td>
+        <td>
+          {{ Math.round(suspectedInvestmentValue.needs).toString().replace(/(\d)(?=(\d\d\d)+([^\d]|$))/g, '$1 ') }}
+        </td>
+
+      </tr>
+    </table>
+  </div>
+<!-- partial -->
+  <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script><script  src="./script.js"></script>
+
+</body>
+</html>
